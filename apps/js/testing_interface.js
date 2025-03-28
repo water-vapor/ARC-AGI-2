@@ -145,7 +145,8 @@ function loadJSONTask(train, test) {
     fillTestInput(CURRENT_INPUT_GRID);
     CURRENT_TEST_PAIR_INDEX = 0;
     $('#current_test_input_id_display').html('1');
-    $('#total_test_input_count_display').html(test.length);
+    $('#total_test_input_count_display').html(TEST_PAIRS.length);
+    updateTestInputButtons();
 }
 
 function display_task_name(task_name, task_index, number_of_tasks, subset="training") {
@@ -274,7 +275,38 @@ function nextTestInput() {
     CURRENT_INPUT_GRID = convertSerializedGridToGridObject(values)
     fillTestInput(CURRENT_INPUT_GRID);
     $('#current_test_input_id_display').html(CURRENT_TEST_PAIR_INDEX + 1);
-    $('#total_test_input_count_display').html(test.length);
+    $('#total_test_input_count_display').html(TEST_PAIRS.length);
+    updateTestInputButtons();
+}
+
+function previousTestInput() {
+    if (CURRENT_TEST_PAIR_INDEX <= 0) {
+        errorMsg('No previous test input.')
+        return
+    }
+    CURRENT_TEST_PAIR_INDEX -= 1;
+    values = TEST_PAIRS[CURRENT_TEST_PAIR_INDEX]['input'];
+    CURRENT_INPUT_GRID = convertSerializedGridToGridObject(values)
+    fillTestInput(CURRENT_INPUT_GRID);
+    $('#current_test_input_id_display').html(CURRENT_TEST_PAIR_INDEX + 1);
+    $('#total_test_input_count_display').html(TEST_PAIRS.length);
+    updateTestInputButtons();
+}
+
+function updateTestInputButtons() {
+    // Hide previous button if we're at the first test input
+    if (CURRENT_TEST_PAIR_INDEX <= 0) {
+        $('#prev_test_input_btn').hide();
+    } else {
+        $('#prev_test_input_btn').show();
+    }
+    
+    // Hide next button if we're at the last test input
+    if (CURRENT_TEST_PAIR_INDEX >= TEST_PAIRS.length - 1) {
+        $('#next_test_input_btn').hide();
+    } else {
+        $('#next_test_input_btn').show();
+    }
 }
 
 function submitSolution() {
@@ -374,6 +406,9 @@ $(document).ready(function () {
             resizeOutputGrid();
         }
     });
+
+    // Initialize the test input buttons visibility
+    updateTestInputButtons();
 
     $('body').keydown(function(event) {
         // Copy and paste functionality.
